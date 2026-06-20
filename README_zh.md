@@ -2,6 +2,7 @@
   <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-DFE0E5"></a>
   <a href="./README_zh.md"><img alt="简体中文版自述文件" src="https://img.shields.io/badge/简体中文-DBEDFA"></a>
 </p>
+
 # Breaking sequential bias: Importance-guided temporal multimodal recommendation via state space models
 
 ## 项目结构
@@ -45,6 +46,7 @@ IGTM-Rec/
 **TMSR（Time-aware Multi-Scale Routing）**
 
 TMSR 将特征处理解耦为两个层次：
+
 - **底层**：通过早期融合构建统一的多模态表示，并利用多分支 GTU（门控时序单元）在不同时间尺度下提取模态特征
 - **顶层**：以物理时间间隔作为显式先验信号，动态调控不同跨度的门控时序感受野，使模型能够根据实时时间间隔自适应地选择历史信息
 
@@ -53,8 +55,6 @@ TMSR 将特征处理解耦为两个层次：
 **IGTP（Importance-Guided Progressive Perturbation）**
 
 IGTP 是一种针对序列过拟合问题的训练策略，通过评估交互行为的重要性，在训练过程中**渐进式地扰动**不重要的序列位置。与随机 Mask、随机 Shuffle 等无差别增强策略不同，IGTP 在保持核心语义结构的前提下，逐步降低模型对固定序列顺序的依赖，从而增强所学用户兴趣表示的鲁棒性和泛化能力。
-
-
 
 ## 实验结果
 
@@ -82,8 +82,6 @@ conda activate your_conda_env
 - mamba-ssm 2.2.2
 - RecBole 1.2.0
 - causal-conv1d 1.4.0
-
-
 
 ## 数据集获取
 
@@ -153,7 +151,7 @@ python main.py
 
 - **Mamba / Mamba2**：[state-spaces/mamba](https://github.com/state-spaces/mamba) — 状态空间模型，为序列建模提供高效骨干网络
 - **RecBole**：[RUCAIBox/RecBole](https://github.com/RUCAIBox/RecBole) — 推荐系统统一框架，提供数据处理、评估等基础设施
--  [SSD4Rec: A Structured State Space Duality Model for Efficient Sequential Recommendation](https://dl.acm.org/doi/10.1145/3773038)
+- [SSD4Rec: A Structured State Space Duality Model for Efficient Sequential Recommendation](https://dl.acm.org/doi/10.1145/3773038)
 - [M3Rec: Selective State Space Models with Mixture-of-Modality Experts for Multi-Modal Sequential Recommendation](https://github.com/Xu107/M3Rec-main)
 
 ---
