@@ -1,0 +1,680 @@
+Thu 05 Mar 2026 17:38:08 INFO  ['main.py']
+Thu 05 Mar 2026 17:38:08 INFO  
+General Hyper Parameters:
+gpu_id = 1
+use_gpu = True
+seed = 2024
+state = INFO
+reproducibility = True
+data_path = dataset/amazon-beauty
+checkpoint_dir = saved
+show_progress = True
+save_dataset = False
+dataset_save_path = None
+save_dataloaders = False
+dataloaders_save_path = None
+log_wandb = False
+
+Training Hyper Parameters:
+epochs = 300
+train_batch_size = 1024
+learner = adam
+learning_rate = 0.0001
+train_neg_sample_args = {'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}
+eval_step = 1
+stopping_step = 10
+clip_grad_norm = None
+weight_decay = 0.0
+loss_decimal_place = 4
+
+Evaluation Hyper Parameters:
+eval_args = {'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}
+repeatable = True
+metrics = ['NDCG', 'MRR', 'Hit']
+topk = [10, 20]
+valid_metric = NDCG@10
+valid_metric_bigger = True
+eval_batch_size = 2048
+metric_decimal_place = 4
+
+Dataset Hyper Parameters:
+field_separator = 	
+seq_separator =  
+USER_ID_FIELD = user_id
+ITEM_ID_FIELD = item_id
+RATING_FIELD = rating
+TIME_FIELD = timestamp
+seq_len = None
+LABEL_FIELD = label
+threshold = None
+NEG_PREFIX = neg_
+load_col = {'inter': ['user_id', 'item_id', 'timestamp']}
+unload_col = None
+unused_col = None
+additional_feat_suffix = None
+rm_dup_inter = None
+val_interval = None
+filter_inter_by_user_or_item = True
+user_inter_num_interval = [5,inf)
+item_inter_num_interval = [5,inf)
+alias_of_user_id = None
+alias_of_item_id = None
+alias_of_entity_id = None
+alias_of_relation_id = None
+preload_weight = None
+normalize_field = None
+normalize_all = None
+ITEM_LIST_LENGTH_FIELD = item_length
+LIST_SUFFIX = _list
+MAX_ITEM_LIST_LENGTH = 200
+POSITION_FIELD = position_id
+HEAD_ENTITY_ID_FIELD = head_id
+TAIL_ENTITY_ID_FIELD = tail_id
+RELATION_ID_FIELD = relation_id
+ENTITY_ID_FIELD = entity_id
+benchmark_filename = None
+
+Other Hyper Parameters: 
+worker = 0
+wandb_project = recbole
+shuffle = True
+require_pow = False
+enable_amp = False
+enable_scaler = False
+transform = None
+numerical_features = []
+discretization = None
+kg_reverse_r = False
+entity_kg_num_interval = [0,inf)
+relation_kg_num_interval = [0,inf)
+MODEL_TYPE = ModelType.SEQUENTIAL
+hidden_size = 256
+loss_type = CE
+d_state = 64
+d_conv = 4
+expand = 2
+headdim = 16
+dt_min = 0.001
+dt_max = 0.1
+d_H = 256
+d_P = 32
+amazon-beauty setting = None
+dropout_prob = 0.4
+norm_embedding = False
+beta = 0.1
+maskratio = 0.2
+num_layers = 3
+var_len = True
+MODEL_INPUT_TYPE = InputType.POINTWISE
+eval_type = EvaluatorType.RANKING
+single_spec = True
+local_rank = 0
+device = cuda
+valid_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+test_neg_sample_args = {'distribution': 'uniform', 'sample_num': 'none'}
+
+
+Thu 05 Mar 2026 17:38:09 INFO  amazon-beauty
+The number of users: 22364
+Average actions of users: 8.876358270357287
+The number of items: 12102
+Average actions of items: 16.403768283612923
+The number of inters: 198502
+The sparsity of the dataset: 99.92665707018277%
+Remain Fields: ['user_id', 'item_id', 'timestamp']
+Thu 05 Mar 2026 17:38:11 INFO  [Training]: train_batch_size = [1024] train_neg_sample_args: [{'distribution': 'none', 'sample_num': 'none', 'alpha': 'none', 'dynamic': False, 'candidate_num': 0}]
+Thu 05 Mar 2026 17:38:11 INFO  [Evaluation]: eval_batch_size = [2048] eval_args: [{'split': {'LS': 'valid_and_test'}, 'order': 'TO', 'group_by': 'user', 'mode': {'valid': 'full', 'test': 'full'}}]
+Thu 05 Mar 2026 17:38:11 INFO  IGTMRec(
+  (item_embedding): Embedding(12102, 256)
+  (img_feat): Embedding(12102, 512)
+  (text_feat): Embedding(12102, 768)
+  (img_trans): Sequential(
+    (0): Linear(in_features=512, out_features=256, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=256, out_features=256, bias=True)
+  )
+  (text_trans): Sequential(
+    (0): Linear(in_features=768, out_features=256, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=256, out_features=256, bias=True)
+  )
+  (LayerNorm): LayerNorm((256,), eps=1e-12, elementwise_affine=True)
+  (dropout): Dropout(p=0.4, inplace=False)
+  (IGTMRec_layers): ModuleList(
+    (0-2): 3 x IGTMRecLayer(
+      (LayerNorm): LayerNorm((256,), eps=1e-12, elementwise_affine=True)
+      (dropout): Dropout(p=0.4, inplace=False)
+      (ffn): FeedForward(
+        (w_1): Linear(in_features=256, out_features=1024, bias=True)
+        (w_2): Linear(in_features=1024, out_features=256, bias=True)
+        (activation): LeakyReLU(negative_slope=0.01)
+        (LayerNorm): LayerNorm((256,), eps=1e-12, elementwise_affine=True)
+        (dropout): Dropout(p=0.4, inplace=False)
+      )
+      (Model): MixerModel(
+        (layers): ModuleList(
+          (0-1): 2 x Block(
+            (mixer): Mamba2(
+              (in_proj): Linear(in_features=256, out_features=1288, bias=False)
+              (conv1d): Conv1d(768, 768, kernel_size=(4,), stride=(1,), padding=(3,), groups=768)
+              (act): SiLU()
+              (norm): RMSNorm()
+              (out_proj): Linear(in_features=512, out_features=256, bias=False)
+            )
+            (norm_mixer): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+            (channel_mixer): FeedForward(
+              (w_1): Linear(in_features=256, out_features=1024, bias=True)
+              (w_2): Linear(in_features=1024, out_features=256, bias=True)
+              (activation): LeakyReLU(negative_slope=0.01)
+              (LayerNorm): LayerNorm((256,), eps=1e-12, elementwise_affine=True)
+              (dropout): Dropout(p=0.2, inplace=False)
+            )
+            (drop_path): DropPath(drop_prob=0.100)
+          )
+        )
+        (norm_f): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+        (drop_out_in_block): Identity()
+        (importance_predictor): Sequential(
+          (0): Linear(in_features=256, out_features=64, bias=True)
+          (1): ReLU()
+          (2): Linear(in_features=64, out_features=1, bias=True)
+          (3): Sigmoid()
+        )
+      )
+      (gtu_fusion): MultiGTUFusion(
+        (item_proj): Linear(in_features=256, out_features=256, bias=True)
+        (img_proj): Linear(in_features=256, out_features=256, bias=True)
+        (text_proj): Linear(in_features=256, out_features=256, bias=True)
+        (gtu): GTU(
+          (tanh): Tanh()
+          (sigmoid): Sigmoid()
+          (con2out): Conv2d(256, 512, kernel_size=(1, 3), stride=(1, 1))
+        )
+        (gtu2): GTU(
+          (tanh): Tanh()
+          (sigmoid): Sigmoid()
+          (con2out): Conv2d(256, 512, kernel_size=(1, 5), stride=(1, 1))
+        )
+        (gtu3): GTU(
+          (tanh): Tanh()
+          (sigmoid): Sigmoid()
+          (con2out): Conv2d(256, 512, kernel_size=(1, 7), stride=(1, 1))
+        )
+        (align_proj1): Linear(in_features=256, out_features=256, bias=True)
+        (align_proj2): Linear(in_features=256, out_features=256, bias=True)
+        (align_proj3): Linear(in_features=256, out_features=256, bias=True)
+        (time_encoder): Sequential(
+          (0): Linear(in_features=1, out_features=256, bias=True)
+          (1): ReLU()
+          (2): Linear(in_features=256, out_features=256, bias=True)
+        )
+        (gate_network): Sequential(
+          (0): Linear(in_features=512, out_features=256, bias=True)
+          (1): ReLU()
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Linear(in_features=256, out_features=3, bias=True)
+          (4): Softmax(dim=-1)
+        )
+        (norm): LayerNorm((256,), eps=1e-05, elementwise_affine=True)
+      )
+      (forward_ssd): Mamba2(
+        (in_proj): Linear(in_features=256, out_features=1184, bias=False)
+        (conv1d): Conv1d(640, 640, kernel_size=(4,), stride=(1,), padding=(3,), groups=640)
+        (act): SiLU()
+        (norm): RMSNorm()
+        (out_proj): Linear(in_features=512, out_features=256, bias=False)
+      )
+    )
+  )
+  (loss_fct): CrossEntropyLoss()
+)
+Trainable parameters: 20137660
+Thu 05 Mar 2026 17:38:38 INFO  epoch 0 training [time: 27.28s, train loss: 1183.3013]
+Thu 05 Mar 2026 17:38:39 INFO  epoch 0 evaluating [time: 0.90s, valid_score: 0.006500]
+Thu 05 Mar 2026 17:38:39 INFO  valid result: 
+ndcg@10 : 0.0065    ndcg@20 : 0.0094    mrr@10 : 0.0044    mrr@20 : 0.0052    hit@10 : 0.0137    hit@20 : 0.0248
+Thu 05 Mar 2026 17:38:39 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:38:57 INFO  epoch 1 training [time: 17.16s, train loss: 1141.9723]
+Thu 05 Mar 2026 17:38:58 INFO  epoch 1 evaluating [time: 0.91s, valid_score: 0.008500]
+Thu 05 Mar 2026 17:38:58 INFO  valid result: 
+ndcg@10 : 0.0085    ndcg@20 : 0.0108    mrr@10 : 0.0057    mrr@20 : 0.0064    hit@10 : 0.0176    hit@20 : 0.0265
+Thu 05 Mar 2026 17:38:58 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:39:15 INFO  epoch 2 training [time: 17.08s, train loss: 1135.3135]
+Thu 05 Mar 2026 17:39:16 INFO  epoch 2 evaluating [time: 0.90s, valid_score: 0.008200]
+Thu 05 Mar 2026 17:39:16 INFO  valid result: 
+ndcg@10 : 0.0082    ndcg@20 : 0.011    mrr@10 : 0.0053    mrr@20 : 0.006    hit@10 : 0.018    hit@20 : 0.0292
+Thu 05 Mar 2026 17:39:33 INFO  epoch 3 training [time: 17.15s, train loss: 1129.5983]
+Thu 05 Mar 2026 17:39:34 INFO  epoch 3 evaluating [time: 0.91s, valid_score: 0.008700]
+Thu 05 Mar 2026 17:39:34 INFO  valid result: 
+ndcg@10 : 0.0087    ndcg@20 : 0.0114    mrr@10 : 0.0057    mrr@20 : 0.0064    hit@10 : 0.0185    hit@20 : 0.0295
+Thu 05 Mar 2026 17:39:35 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:39:52 INFO  epoch 4 training [time: 17.31s, train loss: 1125.4188]
+Thu 05 Mar 2026 17:39:53 INFO  epoch 4 evaluating [time: 0.91s, valid_score: 0.011900]
+Thu 05 Mar 2026 17:39:53 INFO  valid result: 
+ndcg@10 : 0.0119    ndcg@20 : 0.015    mrr@10 : 0.0084    mrr@20 : 0.0092    hit@10 : 0.0233    hit@20 : 0.0357
+Thu 05 Mar 2026 17:39:53 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:40:10 INFO  epoch 5 training [time: 17.20s, train loss: 1119.1394]
+Thu 05 Mar 2026 17:40:11 INFO  epoch 5 evaluating [time: 0.91s, valid_score: 0.013000]
+Thu 05 Mar 2026 17:40:11 INFO  valid result: 
+ndcg@10 : 0.013    ndcg@20 : 0.0165    mrr@10 : 0.009    mrr@20 : 0.01    hit@10 : 0.0261    hit@20 : 0.04
+Thu 05 Mar 2026 17:40:12 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:40:29 INFO  epoch 6 training [time: 17.24s, train loss: 1112.6029]
+Thu 05 Mar 2026 17:40:30 INFO  epoch 6 evaluating [time: 0.91s, valid_score: 0.014300]
+Thu 05 Mar 2026 17:40:30 INFO  valid result: 
+ndcg@10 : 0.0143    ndcg@20 : 0.0182    mrr@10 : 0.0102    mrr@20 : 0.0113    hit@10 : 0.028    hit@20 : 0.0434
+Thu 05 Mar 2026 17:40:31 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:40:48 INFO  epoch 7 training [time: 17.35s, train loss: 1105.1476]
+Thu 05 Mar 2026 17:40:49 INFO  epoch 7 evaluating [time: 0.91s, valid_score: 0.015400]
+Thu 05 Mar 2026 17:40:49 INFO  valid result: 
+ndcg@10 : 0.0154    ndcg@20 : 0.0194    mrr@10 : 0.0106    mrr@20 : 0.0117    hit@10 : 0.0313    hit@20 : 0.047
+Thu 05 Mar 2026 17:40:49 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:41:07 INFO  epoch 8 training [time: 17.23s, train loss: 1097.4370]
+Thu 05 Mar 2026 17:41:07 INFO  epoch 8 evaluating [time: 0.91s, valid_score: 0.017600]
+Thu 05 Mar 2026 17:41:07 INFO  valid result: 
+ndcg@10 : 0.0176    ndcg@20 : 0.0217    mrr@10 : 0.0124    mrr@20 : 0.0135    hit@10 : 0.035    hit@20 : 0.0511
+Thu 05 Mar 2026 17:41:08 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:41:25 INFO  epoch 9 training [time: 17.26s, train loss: 1090.4671]
+Thu 05 Mar 2026 17:41:26 INFO  epoch 9 evaluating [time: 0.92s, valid_score: 0.019900]
+Thu 05 Mar 2026 17:41:26 INFO  valid result: 
+ndcg@10 : 0.0199    ndcg@20 : 0.0246    mrr@10 : 0.0143    mrr@20 : 0.0156    hit@10 : 0.0384    hit@20 : 0.0569
+Thu 05 Mar 2026 17:41:27 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:41:44 INFO  epoch 10 training [time: 17.40s, train loss: 1089.5570]
+Thu 05 Mar 2026 17:41:45 INFO  epoch 10 evaluating [time: 0.92s, valid_score: 0.021600]
+Thu 05 Mar 2026 17:41:45 INFO  valid result: 
+ndcg@10 : 0.0216    ndcg@20 : 0.0266    mrr@10 : 0.0153    mrr@20 : 0.0167    hit@10 : 0.0422    hit@20 : 0.0625
+Thu 05 Mar 2026 17:41:45 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:42:03 INFO  epoch 11 training [time: 17.22s, train loss: 1079.9078]
+Thu 05 Mar 2026 17:42:04 INFO  epoch 11 evaluating [time: 0.91s, valid_score: 0.023100]
+Thu 05 Mar 2026 17:42:04 INFO  valid result: 
+ndcg@10 : 0.0231    ndcg@20 : 0.0286    mrr@10 : 0.0167    mrr@20 : 0.0182    hit@10 : 0.0443    hit@20 : 0.0661
+Thu 05 Mar 2026 17:42:04 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:42:21 INFO  epoch 12 training [time: 17.38s, train loss: 1078.1215]
+Thu 05 Mar 2026 17:42:22 INFO  epoch 12 evaluating [time: 0.91s, valid_score: 0.024400]
+Thu 05 Mar 2026 17:42:22 INFO  valid result: 
+ndcg@10 : 0.0244    ndcg@20 : 0.0302    mrr@10 : 0.0177    mrr@20 : 0.0192    hit@10 : 0.0465    hit@20 : 0.0696
+Thu 05 Mar 2026 17:42:23 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:42:40 INFO  epoch 13 training [time: 17.23s, train loss: 1068.7017]
+Thu 05 Mar 2026 17:42:41 INFO  epoch 13 evaluating [time: 0.91s, valid_score: 0.027400]
+Thu 05 Mar 2026 17:42:41 INFO  valid result: 
+ndcg@10 : 0.0274    ndcg@20 : 0.0334    mrr@10 : 0.0201    mrr@20 : 0.0217    hit@10 : 0.0516    hit@20 : 0.0751
+Thu 05 Mar 2026 17:42:41 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:42:59 INFO  epoch 14 training [time: 17.24s, train loss: 1063.5227]
+Thu 05 Mar 2026 17:43:00 INFO  epoch 14 evaluating [time: 0.91s, valid_score: 0.028600]
+Thu 05 Mar 2026 17:43:00 INFO  valid result: 
+ndcg@10 : 0.0286    ndcg@20 : 0.0349    mrr@10 : 0.0211    mrr@20 : 0.0228    hit@10 : 0.0535    hit@20 : 0.0786
+Thu 05 Mar 2026 17:43:00 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:43:17 INFO  epoch 15 training [time: 17.37s, train loss: 1058.9295]
+Thu 05 Mar 2026 17:43:18 INFO  epoch 15 evaluating [time: 0.91s, valid_score: 0.030800]
+Thu 05 Mar 2026 17:43:18 INFO  valid result: 
+ndcg@10 : 0.0308    ndcg@20 : 0.0371    mrr@10 : 0.0232    mrr@20 : 0.0249    hit@10 : 0.056    hit@20 : 0.0811
+Thu 05 Mar 2026 17:43:19 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:43:39 INFO  epoch 16 training [time: 20.12s, train loss: 1050.9277]
+Thu 05 Mar 2026 17:43:40 INFO  epoch 16 evaluating [time: 0.91s, valid_score: 0.031600]
+Thu 05 Mar 2026 17:43:40 INFO  valid result: 
+ndcg@10 : 0.0316    ndcg@20 : 0.0383    mrr@10 : 0.0234    mrr@20 : 0.0252    hit@10 : 0.0587    hit@20 : 0.0852
+Thu 05 Mar 2026 17:43:40 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:43:57 INFO  epoch 17 training [time: 17.22s, train loss: 1048.7718]
+Thu 05 Mar 2026 17:43:58 INFO  epoch 17 evaluating [time: 0.91s, valid_score: 0.034000]
+Thu 05 Mar 2026 17:43:58 INFO  valid result: 
+ndcg@10 : 0.034    ndcg@20 : 0.0411    mrr@10 : 0.0254    mrr@20 : 0.0273    hit@10 : 0.0623    hit@20 : 0.0907
+Thu 05 Mar 2026 17:43:59 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:44:16 INFO  epoch 18 training [time: 17.41s, train loss: 1040.8859]
+Thu 05 Mar 2026 17:44:17 INFO  epoch 18 evaluating [time: 0.91s, valid_score: 0.034700]
+Thu 05 Mar 2026 17:44:17 INFO  valid result: 
+ndcg@10 : 0.0347    ndcg@20 : 0.0422    mrr@10 : 0.0258    mrr@20 : 0.0278    hit@10 : 0.0639    hit@20 : 0.0938
+Thu 05 Mar 2026 17:44:18 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:44:46 INFO  epoch 19 training [time: 28.37s, train loss: 1041.0857]
+Thu 05 Mar 2026 17:44:47 INFO  epoch 19 evaluating [time: 0.91s, valid_score: 0.036200]
+Thu 05 Mar 2026 17:44:47 INFO  valid result: 
+ndcg@10 : 0.0362    ndcg@20 : 0.0439    mrr@10 : 0.027    mrr@20 : 0.029    hit@10 : 0.0665    hit@20 : 0.097
+Thu 05 Mar 2026 17:44:47 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:45:05 INFO  epoch 20 training [time: 17.31s, train loss: 1031.0962]
+Thu 05 Mar 2026 17:45:05 INFO  epoch 20 evaluating [time: 0.91s, valid_score: 0.038500]
+Thu 05 Mar 2026 17:45:05 INFO  valid result: 
+ndcg@10 : 0.0385    ndcg@20 : 0.0469    mrr@10 : 0.0287    mrr@20 : 0.031    hit@10 : 0.0708    hit@20 : 0.1043
+Thu 05 Mar 2026 17:45:06 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:45:32 INFO  epoch 21 training [time: 25.94s, train loss: 1032.0751]
+Thu 05 Mar 2026 17:45:33 INFO  epoch 21 evaluating [time: 0.91s, valid_score: 0.039100]
+Thu 05 Mar 2026 17:45:33 INFO  valid result: 
+ndcg@10 : 0.0391    ndcg@20 : 0.0475    mrr@10 : 0.029    mrr@20 : 0.0313    hit@10 : 0.0722    hit@20 : 0.1058
+Thu 05 Mar 2026 17:45:33 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:45:50 INFO  epoch 22 training [time: 17.18s, train loss: 1027.1746]
+Thu 05 Mar 2026 17:45:51 INFO  epoch 22 evaluating [time: 0.91s, valid_score: 0.041200]
+Thu 05 Mar 2026 17:45:51 INFO  valid result: 
+ndcg@10 : 0.0412    ndcg@20 : 0.0497    mrr@10 : 0.0307    mrr@20 : 0.033    hit@10 : 0.0758    hit@20 : 0.1095
+Thu 05 Mar 2026 17:45:52 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:46:09 INFO  epoch 23 training [time: 17.36s, train loss: 1029.0969]
+Thu 05 Mar 2026 17:46:10 INFO  epoch 23 evaluating [time: 0.92s, valid_score: 0.042500]
+Thu 05 Mar 2026 17:46:10 INFO  valid result: 
+ndcg@10 : 0.0425    ndcg@20 : 0.0511    mrr@10 : 0.0317    mrr@20 : 0.034    hit@10 : 0.0783    hit@20 : 0.1123
+Thu 05 Mar 2026 17:46:11 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:46:37 INFO  epoch 24 training [time: 26.53s, train loss: 1026.4258]
+Thu 05 Mar 2026 17:46:38 INFO  epoch 24 evaluating [time: 0.91s, valid_score: 0.043000]
+Thu 05 Mar 2026 17:46:38 INFO  valid result: 
+ndcg@10 : 0.043    ndcg@20 : 0.0514    mrr@10 : 0.0318    mrr@20 : 0.0341    hit@10 : 0.0796    hit@20 : 0.1133
+Thu 05 Mar 2026 17:46:38 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:46:56 INFO  epoch 25 training [time: 17.16s, train loss: 1010.7097]
+Thu 05 Mar 2026 17:46:57 INFO  epoch 25 evaluating [time: 0.91s, valid_score: 0.045000]
+Thu 05 Mar 2026 17:46:57 INFO  valid result: 
+ndcg@10 : 0.045    ndcg@20 : 0.0539    mrr@10 : 0.0336    mrr@20 : 0.0361    hit@10 : 0.0823    hit@20 : 0.1177
+Thu 05 Mar 2026 17:46:57 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:47:14 INFO  epoch 26 training [time: 17.37s, train loss: 1013.7197]
+Thu 05 Mar 2026 17:47:15 INFO  epoch 26 evaluating [time: 0.91s, valid_score: 0.044700]
+Thu 05 Mar 2026 17:47:15 INFO  valid result: 
+ndcg@10 : 0.0447    ndcg@20 : 0.0542    mrr@10 : 0.0338    mrr@20 : 0.0364    hit@10 : 0.0803    hit@20 : 0.1178
+Thu 05 Mar 2026 17:47:43 INFO  epoch 27 training [time: 27.65s, train loss: 1011.5665]
+Thu 05 Mar 2026 17:47:44 INFO  epoch 27 evaluating [time: 0.91s, valid_score: 0.046100]
+Thu 05 Mar 2026 17:47:44 INFO  valid result: 
+ndcg@10 : 0.0461    ndcg@20 : 0.0553    mrr@10 : 0.0346    mrr@20 : 0.0371    hit@10 : 0.0837    hit@20 : 0.1201
+Thu 05 Mar 2026 17:47:44 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:48:01 INFO  epoch 28 training [time: 17.17s, train loss: 1009.8772]
+Thu 05 Mar 2026 17:48:02 INFO  epoch 28 evaluating [time: 0.91s, valid_score: 0.048300]
+Thu 05 Mar 2026 17:48:02 INFO  valid result: 
+ndcg@10 : 0.0483    ndcg@20 : 0.0576    mrr@10 : 0.0362    mrr@20 : 0.0387    hit@10 : 0.0879    hit@20 : 0.1249
+Thu 05 Mar 2026 17:48:03 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:48:31 INFO  epoch 29 training [time: 27.77s, train loss: 1011.1200]
+Thu 05 Mar 2026 17:48:32 INFO  epoch 29 evaluating [time: 0.91s, valid_score: 0.049700]
+Thu 05 Mar 2026 17:48:32 INFO  valid result: 
+ndcg@10 : 0.0497    ndcg@20 : 0.0592    mrr@10 : 0.0376    mrr@20 : 0.0401    hit@10 : 0.0897    hit@20 : 0.1274
+Thu 05 Mar 2026 17:48:32 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:48:49 INFO  epoch 30 training [time: 17.18s, train loss: 1001.3505]
+Thu 05 Mar 2026 17:48:50 INFO  epoch 30 evaluating [time: 0.91s, valid_score: 0.051900]
+Thu 05 Mar 2026 17:48:50 INFO  valid result: 
+ndcg@10 : 0.0519    ndcg@20 : 0.0613    mrr@10 : 0.0392    mrr@20 : 0.0418    hit@10 : 0.0935    hit@20 : 0.1309
+Thu 05 Mar 2026 17:48:51 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:49:08 INFO  epoch 31 training [time: 17.20s, train loss: 998.9038]
+Thu 05 Mar 2026 17:49:09 INFO  epoch 31 evaluating [time: 0.91s, valid_score: 0.052100]
+Thu 05 Mar 2026 17:49:09 INFO  valid result: 
+ndcg@10 : 0.0521    ndcg@20 : 0.0618    mrr@10 : 0.0392    mrr@20 : 0.0418    hit@10 : 0.0946    hit@20 : 0.1329
+Thu 05 Mar 2026 17:49:09 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:49:35 INFO  epoch 32 training [time: 26.11s, train loss: 989.6867]
+Thu 05 Mar 2026 17:49:36 INFO  epoch 32 evaluating [time: 0.91s, valid_score: 0.052800]
+Thu 05 Mar 2026 17:49:36 INFO  valid result: 
+ndcg@10 : 0.0528    ndcg@20 : 0.0626    mrr@10 : 0.04    mrr@20 : 0.0426    hit@10 : 0.0948    hit@20 : 0.1337
+Thu 05 Mar 2026 17:49:37 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:49:54 INFO  epoch 33 training [time: 17.19s, train loss: 992.6407]
+Thu 05 Mar 2026 17:49:55 INFO  epoch 33 evaluating [time: 0.91s, valid_score: 0.053500]
+Thu 05 Mar 2026 17:49:55 INFO  valid result: 
+ndcg@10 : 0.0535    ndcg@20 : 0.0636    mrr@10 : 0.0407    mrr@20 : 0.0434    hit@10 : 0.0954    hit@20 : 0.1356
+Thu 05 Mar 2026 17:49:55 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:50:12 INFO  epoch 34 training [time: 17.22s, train loss: 990.4470]
+Thu 05 Mar 2026 17:50:13 INFO  epoch 34 evaluating [time: 0.91s, valid_score: 0.054600]
+Thu 05 Mar 2026 17:50:13 INFO  valid result: 
+ndcg@10 : 0.0546    ndcg@20 : 0.0647    mrr@10 : 0.0412    mrr@20 : 0.0439    hit@10 : 0.0986    hit@20 : 0.1384
+Thu 05 Mar 2026 17:50:14 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:50:41 INFO  epoch 35 training [time: 27.01s, train loss: 987.6835]
+Thu 05 Mar 2026 17:50:42 INFO  epoch 35 evaluating [time: 0.91s, valid_score: 0.055900]
+Thu 05 Mar 2026 17:50:42 INFO  valid result: 
+ndcg@10 : 0.0559    ndcg@20 : 0.0657    mrr@10 : 0.0422    mrr@20 : 0.0449    hit@10 : 0.1007    hit@20 : 0.1399
+Thu 05 Mar 2026 17:50:42 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:51:00 INFO  epoch 36 training [time: 17.31s, train loss: 979.9008]
+Thu 05 Mar 2026 17:51:01 INFO  epoch 36 evaluating [time: 0.91s, valid_score: 0.055900]
+Thu 05 Mar 2026 17:51:01 INFO  valid result: 
+ndcg@10 : 0.0559    ndcg@20 : 0.0658    mrr@10 : 0.0421    mrr@20 : 0.0448    hit@10 : 0.1013    hit@20 : 0.1404
+Thu 05 Mar 2026 17:51:01 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:51:18 INFO  epoch 37 training [time: 17.22s, train loss: 979.3917]
+Thu 05 Mar 2026 17:51:19 INFO  epoch 37 evaluating [time: 0.91s, valid_score: 0.056700]
+Thu 05 Mar 2026 17:51:19 INFO  valid result: 
+ndcg@10 : 0.0567    ndcg@20 : 0.0666    mrr@10 : 0.0428    mrr@20 : 0.0455    hit@10 : 0.1023    hit@20 : 0.1415
+Thu 05 Mar 2026 17:51:20 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:51:37 INFO  epoch 38 training [time: 17.29s, train loss: 981.8790]
+Thu 05 Mar 2026 17:51:38 INFO  epoch 38 evaluating [time: 0.91s, valid_score: 0.056800]
+Thu 05 Mar 2026 17:51:38 INFO  valid result: 
+ndcg@10 : 0.0568    ndcg@20 : 0.0671    mrr@10 : 0.0431    mrr@20 : 0.0459    hit@10 : 0.1017    hit@20 : 0.143
+Thu 05 Mar 2026 17:51:38 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:51:55 INFO  epoch 39 training [time: 17.25s, train loss: 963.3827]
+Thu 05 Mar 2026 17:51:57 INFO  epoch 39 evaluating [time: 1.04s, valid_score: 0.058500]
+Thu 05 Mar 2026 17:51:57 INFO  valid result: 
+ndcg@10 : 0.0585    ndcg@20 : 0.0685    mrr@10 : 0.0445    mrr@20 : 0.0472    hit@10 : 0.1045    hit@20 : 0.1443
+Thu 05 Mar 2026 17:51:57 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:52:14 INFO  epoch 40 training [time: 17.29s, train loss: 978.7858]
+Thu 05 Mar 2026 17:52:15 INFO  epoch 40 evaluating [time: 0.91s, valid_score: 0.058500]
+Thu 05 Mar 2026 17:52:15 INFO  valid result: 
+ndcg@10 : 0.0585    ndcg@20 : 0.0684    mrr@10 : 0.0443    mrr@20 : 0.047    hit@10 : 0.1052    hit@20 : 0.1443
+Thu 05 Mar 2026 17:52:16 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:52:33 INFO  epoch 41 training [time: 17.25s, train loss: 967.6298]
+Thu 05 Mar 2026 17:52:34 INFO  epoch 41 evaluating [time: 0.91s, valid_score: 0.059000]
+Thu 05 Mar 2026 17:52:34 INFO  valid result: 
+ndcg@10 : 0.059    ndcg@20 : 0.0688    mrr@10 : 0.0446    mrr@20 : 0.0473    hit@10 : 0.1062    hit@20 : 0.1451
+Thu 05 Mar 2026 17:52:34 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:52:52 INFO  epoch 42 training [time: 17.37s, train loss: 955.2818]
+Thu 05 Mar 2026 17:52:53 INFO  epoch 42 evaluating [time: 0.91s, valid_score: 0.059600]
+Thu 05 Mar 2026 17:52:53 INFO  valid result: 
+ndcg@10 : 0.0596    ndcg@20 : 0.0699    mrr@10 : 0.0453    mrr@20 : 0.0481    hit@10 : 0.1065    hit@20 : 0.1472
+Thu 05 Mar 2026 17:52:53 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:53:10 INFO  epoch 43 training [time: 17.27s, train loss: 955.8055]
+Thu 05 Mar 2026 17:53:11 INFO  epoch 43 evaluating [time: 0.91s, valid_score: 0.060400]
+Thu 05 Mar 2026 17:53:11 INFO  valid result: 
+ndcg@10 : 0.0604    ndcg@20 : 0.0703    mrr@10 : 0.046    mrr@20 : 0.0487    hit@10 : 0.1075    hit@20 : 0.1467
+Thu 05 Mar 2026 17:53:12 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:53:29 INFO  epoch 44 training [time: 17.28s, train loss: 961.4027]
+Thu 05 Mar 2026 17:53:30 INFO  epoch 44 evaluating [time: 0.91s, valid_score: 0.060700]
+Thu 05 Mar 2026 17:53:30 INFO  valid result: 
+ndcg@10 : 0.0607    ndcg@20 : 0.0708    mrr@10 : 0.0461    mrr@20 : 0.0488    hit@10 : 0.1088    hit@20 : 0.1489
+Thu 05 Mar 2026 17:53:30 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:53:48 INFO  epoch 45 training [time: 17.39s, train loss: 950.1611]
+Thu 05 Mar 2026 17:53:49 INFO  epoch 45 evaluating [time: 0.91s, valid_score: 0.061400]
+Thu 05 Mar 2026 17:53:49 INFO  valid result: 
+ndcg@10 : 0.0614    ndcg@20 : 0.0719    mrr@10 : 0.0471    mrr@20 : 0.0499    hit@10 : 0.1083    hit@20 : 0.15
+Thu 05 Mar 2026 17:53:49 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:54:06 INFO  epoch 46 training [time: 17.26s, train loss: 949.2894]
+Thu 05 Mar 2026 17:54:07 INFO  epoch 46 evaluating [time: 0.91s, valid_score: 0.061900]
+Thu 05 Mar 2026 17:54:07 INFO  valid result: 
+ndcg@10 : 0.0619    ndcg@20 : 0.0718    mrr@10 : 0.0471    mrr@20 : 0.0498    hit@10 : 0.1105    hit@20 : 0.1501
+Thu 05 Mar 2026 17:54:08 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:54:25 INFO  epoch 47 training [time: 17.26s, train loss: 945.9299]
+Thu 05 Mar 2026 17:54:26 INFO  epoch 47 evaluating [time: 1.04s, valid_score: 0.062000]
+Thu 05 Mar 2026 17:54:26 INFO  valid result: 
+ndcg@10 : 0.062    ndcg@20 : 0.0725    mrr@10 : 0.0474    mrr@20 : 0.0503    hit@10 : 0.1098    hit@20 : 0.1511
+Thu 05 Mar 2026 17:54:27 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:54:44 INFO  epoch 48 training [time: 17.28s, train loss: 942.6619]
+Thu 05 Mar 2026 17:54:45 INFO  epoch 48 evaluating [time: 0.92s, valid_score: 0.062200]
+Thu 05 Mar 2026 17:54:45 INFO  valid result: 
+ndcg@10 : 0.0622    ndcg@20 : 0.0727    mrr@10 : 0.0474    mrr@20 : 0.0502    hit@10 : 0.1109    hit@20 : 0.1526
+Thu 05 Mar 2026 17:54:45 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:55:03 INFO  epoch 49 training [time: 17.26s, train loss: 950.9021]
+Thu 05 Mar 2026 17:55:04 INFO  epoch 49 evaluating [time: 0.91s, valid_score: 0.062600]
+Thu 05 Mar 2026 17:55:04 INFO  valid result: 
+ndcg@10 : 0.0626    ndcg@20 : 0.0732    mrr@10 : 0.0479    mrr@20 : 0.0508    hit@10 : 0.1108    hit@20 : 0.1527
+Thu 05 Mar 2026 17:55:04 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:55:21 INFO  epoch 50 training [time: 17.25s, train loss: 938.9863]
+Thu 05 Mar 2026 17:55:22 INFO  epoch 50 evaluating [time: 0.91s, valid_score: 0.063700]
+Thu 05 Mar 2026 17:55:22 INFO  valid result: 
+ndcg@10 : 0.0637    ndcg@20 : 0.074    mrr@10 : 0.0488    mrr@20 : 0.0516    hit@10 : 0.1124    hit@20 : 0.1534
+Thu 05 Mar 2026 17:55:23 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:55:40 INFO  epoch 51 training [time: 17.36s, train loss: 940.3814]
+Thu 05 Mar 2026 17:55:41 INFO  epoch 51 evaluating [time: 0.91s, valid_score: 0.063800]
+Thu 05 Mar 2026 17:55:41 INFO  valid result: 
+ndcg@10 : 0.0638    ndcg@20 : 0.0744    mrr@10 : 0.0488    mrr@20 : 0.0518    hit@10 : 0.1125    hit@20 : 0.1544
+Thu 05 Mar 2026 17:55:41 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:55:59 INFO  epoch 52 training [time: 17.29s, train loss: 943.8330]
+Thu 05 Mar 2026 17:56:00 INFO  epoch 52 evaluating [time: 0.91s, valid_score: 0.064400]
+Thu 05 Mar 2026 17:56:00 INFO  valid result: 
+ndcg@10 : 0.0644    ndcg@20 : 0.0745    mrr@10 : 0.0493    mrr@20 : 0.052    hit@10 : 0.1139    hit@20 : 0.1539
+Thu 05 Mar 2026 17:56:00 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:56:17 INFO  epoch 53 training [time: 17.29s, train loss: 943.3764]
+Thu 05 Mar 2026 17:56:18 INFO  epoch 53 evaluating [time: 0.91s, valid_score: 0.063900]
+Thu 05 Mar 2026 17:56:18 INFO  valid result: 
+ndcg@10 : 0.0639    ndcg@20 : 0.0743    mrr@10 : 0.0491    mrr@20 : 0.0519    hit@10 : 0.1122    hit@20 : 0.1538
+Thu 05 Mar 2026 17:56:36 INFO  epoch 54 training [time: 17.43s, train loss: 935.9476]
+Thu 05 Mar 2026 17:56:36 INFO  epoch 54 evaluating [time: 0.91s, valid_score: 0.064200]
+Thu 05 Mar 2026 17:56:36 INFO  valid result: 
+ndcg@10 : 0.0642    ndcg@20 : 0.0746    mrr@10 : 0.0494    mrr@20 : 0.0522    hit@10 : 0.1125    hit@20 : 0.1536
+Thu 05 Mar 2026 17:56:54 INFO  epoch 55 training [time: 17.26s, train loss: 926.9391]
+Thu 05 Mar 2026 17:56:55 INFO  epoch 55 evaluating [time: 0.91s, valid_score: 0.064400]
+Thu 05 Mar 2026 17:56:55 INFO  valid result: 
+ndcg@10 : 0.0644    ndcg@20 : 0.0746    mrr@10 : 0.0492    mrr@20 : 0.052    hit@10 : 0.1139    hit@20 : 0.1547
+Thu 05 Mar 2026 17:56:55 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:57:12 INFO  epoch 56 training [time: 17.29s, train loss: 930.0931]
+Thu 05 Mar 2026 17:57:13 INFO  epoch 56 evaluating [time: 0.91s, valid_score: 0.065200]
+Thu 05 Mar 2026 17:57:13 INFO  valid result: 
+ndcg@10 : 0.0652    ndcg@20 : 0.0758    mrr@10 : 0.05    mrr@20 : 0.0529    hit@10 : 0.1147    hit@20 : 0.1567
+Thu 05 Mar 2026 17:57:14 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:57:31 INFO  epoch 57 training [time: 17.29s, train loss: 920.2667]
+Thu 05 Mar 2026 17:57:32 INFO  epoch 57 evaluating [time: 0.91s, valid_score: 0.065100]
+Thu 05 Mar 2026 17:57:32 INFO  valid result: 
+ndcg@10 : 0.0651    ndcg@20 : 0.0756    mrr@10 : 0.0499    mrr@20 : 0.0527    hit@10 : 0.1149    hit@20 : 0.1566
+Thu 05 Mar 2026 17:57:49 INFO  epoch 58 training [time: 17.43s, train loss: 935.5733]
+Thu 05 Mar 2026 17:57:50 INFO  epoch 58 evaluating [time: 0.91s, valid_score: 0.065000]
+Thu 05 Mar 2026 17:57:50 INFO  valid result: 
+ndcg@10 : 0.065    ndcg@20 : 0.0755    mrr@10 : 0.0499    mrr@20 : 0.0527    hit@10 : 0.1147    hit@20 : 0.1561
+Thu 05 Mar 2026 17:58:08 INFO  epoch 59 training [time: 17.27s, train loss: 915.7776]
+Thu 05 Mar 2026 17:58:09 INFO  epoch 59 evaluating [time: 0.91s, valid_score: 0.065600]
+Thu 05 Mar 2026 17:58:09 INFO  valid result: 
+ndcg@10 : 0.0656    ndcg@20 : 0.0762    mrr@10 : 0.0505    mrr@20 : 0.0534    hit@10 : 0.1145    hit@20 : 0.1569
+Thu 05 Mar 2026 17:58:09 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:58:26 INFO  epoch 60 training [time: 17.25s, train loss: 910.7532]
+Thu 05 Mar 2026 17:58:27 INFO  epoch 60 evaluating [time: 0.91s, valid_score: 0.066000]
+Thu 05 Mar 2026 17:58:27 INFO  valid result: 
+ndcg@10 : 0.066    ndcg@20 : 0.0764    mrr@10 : 0.0509    mrr@20 : 0.0537    hit@10 : 0.1155    hit@20 : 0.1565
+Thu 05 Mar 2026 17:58:28 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:58:45 INFO  epoch 61 training [time: 17.41s, train loss: 927.3259]
+Thu 05 Mar 2026 17:58:46 INFO  epoch 61 evaluating [time: 0.91s, valid_score: 0.065100]
+Thu 05 Mar 2026 17:58:46 INFO  valid result: 
+ndcg@10 : 0.0651    ndcg@20 : 0.0754    mrr@10 : 0.0499    mrr@20 : 0.0526    hit@10 : 0.1151    hit@20 : 0.1561
+Thu 05 Mar 2026 17:59:03 INFO  epoch 62 training [time: 17.29s, train loss: 905.0227]
+Thu 05 Mar 2026 17:59:04 INFO  epoch 62 evaluating [time: 0.91s, valid_score: 0.066100]
+Thu 05 Mar 2026 17:59:04 INFO  valid result: 
+ndcg@10 : 0.0661    ndcg@20 : 0.0763    mrr@10 : 0.0508    mrr@20 : 0.0536    hit@10 : 0.116    hit@20 : 0.1567
+Thu 05 Mar 2026 17:59:05 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 17:59:22 INFO  epoch 63 training [time: 17.30s, train loss: 906.7519]
+Thu 05 Mar 2026 17:59:23 INFO  epoch 63 evaluating [time: 0.91s, valid_score: 0.065800]
+Thu 05 Mar 2026 17:59:23 INFO  valid result: 
+ndcg@10 : 0.0658    ndcg@20 : 0.0765    mrr@10 : 0.0508    mrr@20 : 0.0537    hit@10 : 0.1147    hit@20 : 0.1573
+Thu 05 Mar 2026 17:59:42 INFO  epoch 64 training [time: 19.60s, train loss: 908.6889]
+Thu 05 Mar 2026 17:59:44 INFO  epoch 64 evaluating [time: 1.04s, valid_score: 0.066200]
+Thu 05 Mar 2026 17:59:44 INFO  valid result: 
+ndcg@10 : 0.0662    ndcg@20 : 0.0762    mrr@10 : 0.051    mrr@20 : 0.0536    hit@10 : 0.116    hit@20 : 0.1557
+Thu 05 Mar 2026 17:59:44 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:00:01 INFO  epoch 65 training [time: 17.29s, train loss: 897.9311]
+Thu 05 Mar 2026 18:00:02 INFO  epoch 65 evaluating [time: 0.91s, valid_score: 0.066000]
+Thu 05 Mar 2026 18:00:02 INFO  valid result: 
+ndcg@10 : 0.066    ndcg@20 : 0.0763    mrr@10 : 0.051    mrr@20 : 0.0538    hit@10 : 0.1151    hit@20 : 0.1562
+Thu 05 Mar 2026 18:00:30 INFO  epoch 66 training [time: 28.27s, train loss: 905.9822]
+Thu 05 Mar 2026 18:00:31 INFO  epoch 66 evaluating [time: 0.93s, valid_score: 0.065900]
+Thu 05 Mar 2026 18:00:31 INFO  valid result: 
+ndcg@10 : 0.0659    ndcg@20 : 0.0761    mrr@10 : 0.0508    mrr@20 : 0.0536    hit@10 : 0.1151    hit@20 : 0.1556
+Thu 05 Mar 2026 18:00:49 INFO  epoch 67 training [time: 17.23s, train loss: 897.8747]
+Thu 05 Mar 2026 18:00:50 INFO  epoch 67 evaluating [time: 1.08s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:00:50 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0763    mrr@10 : 0.0512    mrr@20 : 0.0539    hit@10 : 0.116    hit@20 : 0.1557
+Thu 05 Mar 2026 18:00:50 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:01:07 INFO  epoch 68 training [time: 17.28s, train loss: 906.9335]
+Thu 05 Mar 2026 18:01:08 INFO  epoch 68 evaluating [time: 0.92s, valid_score: 0.066200]
+Thu 05 Mar 2026 18:01:08 INFO  valid result: 
+ndcg@10 : 0.0662    ndcg@20 : 0.0769    mrr@10 : 0.0512    mrr@20 : 0.0542    hit@10 : 0.115    hit@20 : 0.1577
+Thu 05 Mar 2026 18:01:26 INFO  epoch 69 training [time: 17.86s, train loss: 890.8122]
+Thu 05 Mar 2026 18:01:27 INFO  epoch 69 evaluating [time: 0.95s, valid_score: 0.065700]
+Thu 05 Mar 2026 18:01:27 INFO  valid result: 
+ndcg@10 : 0.0657    ndcg@20 : 0.0758    mrr@10 : 0.0505    mrr@20 : 0.0533    hit@10 : 0.1152    hit@20 : 0.1553
+Thu 05 Mar 2026 18:01:44 INFO  epoch 70 training [time: 17.34s, train loss: 891.2102]
+Thu 05 Mar 2026 18:01:46 INFO  epoch 70 evaluating [time: 1.05s, valid_score: 0.065900]
+Thu 05 Mar 2026 18:01:46 INFO  valid result: 
+ndcg@10 : 0.0659    ndcg@20 : 0.0759    mrr@10 : 0.0507    mrr@20 : 0.0534    hit@10 : 0.1155    hit@20 : 0.1553
+Thu 05 Mar 2026 18:02:03 INFO  epoch 71 training [time: 17.28s, train loss: 877.1575]
+Thu 05 Mar 2026 18:02:04 INFO  epoch 71 evaluating [time: 0.91s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:02:04 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0767    mrr@10 : 0.0513    mrr@20 : 0.0541    hit@10 : 0.1156    hit@20 : 0.1567
+Thu 05 Mar 2026 18:02:05 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:02:22 INFO  epoch 72 training [time: 17.25s, train loss: 882.2158]
+Thu 05 Mar 2026 18:02:23 INFO  epoch 72 evaluating [time: 0.91s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:02:23 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0764    mrr@10 : 0.0514    mrr@20 : 0.0541    hit@10 : 0.1154    hit@20 : 0.1551
+Thu 05 Mar 2026 18:02:23 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:02:41 INFO  epoch 73 training [time: 17.25s, train loss: 884.3025]
+Thu 05 Mar 2026 18:02:41 INFO  epoch 73 evaluating [time: 0.91s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:02:41 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0763    mrr@10 : 0.0514    mrr@20 : 0.0541    hit@10 : 0.1152    hit@20 : 0.1545
+Thu 05 Mar 2026 18:02:42 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:02:59 INFO  epoch 74 training [time: 17.48s, train loss: 886.0033]
+Thu 05 Mar 2026 18:03:00 INFO  epoch 74 evaluating [time: 0.92s, valid_score: 0.066800]
+Thu 05 Mar 2026 18:03:00 INFO  valid result: 
+ndcg@10 : 0.0668    ndcg@20 : 0.0765    mrr@10 : 0.0517    mrr@20 : 0.0543    hit@10 : 0.116    hit@20 : 0.1546
+Thu 05 Mar 2026 18:03:01 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:03:18 INFO  epoch 75 training [time: 17.32s, train loss: 882.6468]
+Thu 05 Mar 2026 18:03:19 INFO  epoch 75 evaluating [time: 0.91s, valid_score: 0.066100]
+Thu 05 Mar 2026 18:03:19 INFO  valid result: 
+ndcg@10 : 0.0661    ndcg@20 : 0.076    mrr@10 : 0.051    mrr@20 : 0.0537    hit@10 : 0.1154    hit@20 : 0.155
+Thu 05 Mar 2026 18:03:36 INFO  epoch 76 training [time: 17.32s, train loss: 879.5342]
+Thu 05 Mar 2026 18:03:37 INFO  epoch 76 evaluating [time: 0.91s, valid_score: 0.065600]
+Thu 05 Mar 2026 18:03:37 INFO  valid result: 
+ndcg@10 : 0.0656    ndcg@20 : 0.0756    mrr@10 : 0.0508    mrr@20 : 0.0535    hit@10 : 0.1142    hit@20 : 0.1536
+Thu 05 Mar 2026 18:03:55 INFO  epoch 77 training [time: 17.41s, train loss: 855.3386]
+Thu 05 Mar 2026 18:03:56 INFO  epoch 77 evaluating [time: 0.91s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:03:56 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0764    mrr@10 : 0.0516    mrr@20 : 0.0543    hit@10 : 0.1145    hit@20 : 0.1543
+Thu 05 Mar 2026 18:04:13 INFO  epoch 78 training [time: 17.27s, train loss: 865.3730]
+Thu 05 Mar 2026 18:04:14 INFO  epoch 78 evaluating [time: 0.92s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:04:14 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0766    mrr@10 : 0.0517    mrr@20 : 0.0545    hit@10 : 0.1142    hit@20 : 0.1549
+Thu 05 Mar 2026 18:04:31 INFO  epoch 79 training [time: 17.29s, train loss: 873.0690]
+Thu 05 Mar 2026 18:04:32 INFO  epoch 79 evaluating [time: 0.91s, valid_score: 0.066300]
+Thu 05 Mar 2026 18:04:32 INFO  valid result: 
+ndcg@10 : 0.0663    ndcg@20 : 0.0767    mrr@10 : 0.0518    mrr@20 : 0.0546    hit@10 : 0.1138    hit@20 : 0.1548
+Thu 05 Mar 2026 18:04:49 INFO  epoch 80 training [time: 17.44s, train loss: 878.3264]
+Thu 05 Mar 2026 18:04:50 INFO  epoch 80 evaluating [time: 0.92s, valid_score: 0.066400]
+Thu 05 Mar 2026 18:04:50 INFO  valid result: 
+ndcg@10 : 0.0664    ndcg@20 : 0.0762    mrr@10 : 0.0517    mrr@20 : 0.0544    hit@10 : 0.1144    hit@20 : 0.1531
+Thu 05 Mar 2026 18:05:08 INFO  epoch 81 training [time: 17.30s, train loss: 855.1730]
+Thu 05 Mar 2026 18:05:08 INFO  epoch 81 evaluating [time: 0.91s, valid_score: 0.067000]
+Thu 05 Mar 2026 18:05:08 INFO  valid result: 
+ndcg@10 : 0.067    ndcg@20 : 0.0766    mrr@10 : 0.0519    mrr@20 : 0.0545    hit@10 : 0.1163    hit@20 : 0.1545
+Thu 05 Mar 2026 18:05:09 INFO  Saving current: saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:05:27 INFO  epoch 82 training [time: 17.26s, train loss: 871.9658]
+Thu 05 Mar 2026 18:05:28 INFO  epoch 82 evaluating [time: 0.91s, valid_score: 0.066300]
+Thu 05 Mar 2026 18:05:28 INFO  valid result: 
+ndcg@10 : 0.0663    ndcg@20 : 0.0761    mrr@10 : 0.0518    mrr@20 : 0.0545    hit@10 : 0.1135    hit@20 : 0.1523
+Thu 05 Mar 2026 18:05:45 INFO  epoch 83 training [time: 17.38s, train loss: 845.5833]
+Thu 05 Mar 2026 18:05:46 INFO  epoch 83 evaluating [time: 0.91s, valid_score: 0.065500]
+Thu 05 Mar 2026 18:05:46 INFO  valid result: 
+ndcg@10 : 0.0655    ndcg@20 : 0.0751    mrr@10 : 0.0512    mrr@20 : 0.0538    hit@10 : 0.1121    hit@20 : 0.1503
+Thu 05 Mar 2026 18:06:03 INFO  epoch 84 training [time: 17.30s, train loss: 847.6362]
+Thu 05 Mar 2026 18:06:04 INFO  epoch 84 evaluating [time: 0.91s, valid_score: 0.066300]
+Thu 05 Mar 2026 18:06:04 INFO  valid result: 
+ndcg@10 : 0.0663    ndcg@20 : 0.0761    mrr@10 : 0.0518    mrr@20 : 0.0544    hit@10 : 0.1137    hit@20 : 0.1525
+Thu 05 Mar 2026 18:06:21 INFO  epoch 85 training [time: 17.30s, train loss: 864.5134]
+Thu 05 Mar 2026 18:06:22 INFO  epoch 85 evaluating [time: 0.91s, valid_score: 0.066300]
+Thu 05 Mar 2026 18:06:22 INFO  valid result: 
+ndcg@10 : 0.0663    ndcg@20 : 0.0761    mrr@10 : 0.0518    mrr@20 : 0.0545    hit@10 : 0.1134    hit@20 : 0.1524
+Thu 05 Mar 2026 18:06:40 INFO  epoch 86 training [time: 17.29s, train loss: 846.0879]
+Thu 05 Mar 2026 18:06:41 INFO  epoch 86 evaluating [time: 0.91s, valid_score: 0.065600]
+Thu 05 Mar 2026 18:06:41 INFO  valid result: 
+ndcg@10 : 0.0656    ndcg@20 : 0.0752    mrr@10 : 0.0511    mrr@20 : 0.0538    hit@10 : 0.1127    hit@20 : 0.1511
+Thu 05 Mar 2026 18:06:58 INFO  epoch 87 training [time: 17.44s, train loss: 878.6357]
+Thu 05 Mar 2026 18:06:59 INFO  epoch 87 evaluating [time: 0.91s, valid_score: 0.065400]
+Thu 05 Mar 2026 18:06:59 INFO  valid result: 
+ndcg@10 : 0.0654    ndcg@20 : 0.0755    mrr@10 : 0.0514    mrr@20 : 0.0541    hit@10 : 0.1111    hit@20 : 0.1513
+Thu 05 Mar 2026 18:07:16 INFO  epoch 88 training [time: 17.26s, train loss: 840.5380]
+Thu 05 Mar 2026 18:07:17 INFO  epoch 88 evaluating [time: 0.92s, valid_score: 0.065700]
+Thu 05 Mar 2026 18:07:17 INFO  valid result: 
+ndcg@10 : 0.0657    ndcg@20 : 0.0753    mrr@10 : 0.0515    mrr@20 : 0.0541    hit@10 : 0.1119    hit@20 : 0.1502
+Thu 05 Mar 2026 18:07:34 INFO  epoch 89 training [time: 17.27s, train loss: 837.2732]
+Thu 05 Mar 2026 18:07:35 INFO  epoch 89 evaluating [time: 0.91s, valid_score: 0.066100]
+Thu 05 Mar 2026 18:07:35 INFO  valid result: 
+ndcg@10 : 0.0661    ndcg@20 : 0.0757    mrr@10 : 0.052    mrr@20 : 0.0546    hit@10 : 0.112    hit@20 : 0.1503
+Thu 05 Mar 2026 18:07:53 INFO  epoch 90 training [time: 17.39s, train loss: 842.6584]
+Thu 05 Mar 2026 18:07:54 INFO  epoch 90 evaluating [time: 0.91s, valid_score: 0.065800]
+Thu 05 Mar 2026 18:07:54 INFO  valid result: 
+ndcg@10 : 0.0658    ndcg@20 : 0.0751    mrr@10 : 0.0519    mrr@20 : 0.0544    hit@10 : 0.1112    hit@20 : 0.1481
+Thu 05 Mar 2026 18:08:11 INFO  epoch 91 training [time: 17.32s, train loss: 833.4364]
+Thu 05 Mar 2026 18:08:12 INFO  epoch 91 evaluating [time: 0.91s, valid_score: 0.066000]
+Thu 05 Mar 2026 18:08:12 INFO  valid result: 
+ndcg@10 : 0.066    ndcg@20 : 0.0756    mrr@10 : 0.0519    mrr@20 : 0.0546    hit@10 : 0.1117    hit@20 : 0.1502
+Thu 05 Mar 2026 18:08:29 INFO  epoch 92 training [time: 17.29s, train loss: 836.2188]
+Thu 05 Mar 2026 18:08:30 INFO  epoch 92 evaluating [time: 0.91s, valid_score: 0.065700]
+Thu 05 Mar 2026 18:08:30 INFO  valid result: 
+ndcg@10 : 0.0657    ndcg@20 : 0.0749    mrr@10 : 0.0515    mrr@20 : 0.0539    hit@10 : 0.1125    hit@20 : 0.149
+Thu 05 Mar 2026 18:08:30 INFO  Finished training, best eval result in epoch 81
+Thu 05 Mar 2026 18:08:30 INFO  Loading model structure and parameters from saved/IGTMRec-Mar-05-2026_17-38-11.pth
+Thu 05 Mar 2026 18:08:32 INFO  The running environment of this training is as follows:
++-------------+----------------+
+| Environment |     Usage      |
++=============+================+
+| CPU         |     0.30 %     |
++-------------+----------------+
+| GPU         | 4.16 G/23.69 G |
++-------------+----------------+
+| Memory      | 2.41 G/31.11 G |
++-------------+----------------+
+Thu 05 Mar 2026 18:08:32 INFO  best valid : OrderedDict([('ndcg@10', 0.067), ('ndcg@20', 0.0766), ('mrr@10', 0.0519), ('mrr@20', 0.0545), ('hit@10', 0.1163), ('hit@20', 0.1545)])
+Thu 05 Mar 2026 18:08:32 INFO  test result: OrderedDict([('ndcg@10', 0.0539), ('ndcg@20', 0.0628), ('mrr@10', 0.0419), ('mrr@20', 0.0443), ('hit@10', 0.0933), ('hit@20', 0.1288)])

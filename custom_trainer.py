@@ -7,8 +7,7 @@ import torch.optim as optim
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from tqdm import tqdm
 import torch.cuda.amp as amp
-# from tensorboardX import SummaryWriter   
-# from torch.utils.tensorboard import SummaryWriter
+
 
 from recbole.data.interaction import Interaction
 from recbole.data.dataloader import FullSortEvalDataLoader
@@ -37,12 +36,8 @@ class IGTMRecTrainer(Trainer):
         self.count=0
 
     def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
-        # 清除---------
-        # torch.backends.cuda.cufft_plan_cache.clear()
-        # 清除---------
 
         self.model.train()
-        # 使用模型自带的损失计算方法。
         loss_func = self.model.calculate_loss
         total_loss = None
         iter_data = (
@@ -57,7 +52,6 @@ class IGTMRecTrainer(Trainer):
         )
 
         training_time_per_epoch = 0
-        # 创建梯度缩放器（用于混合精度训练）
         scaler = amp.GradScaler('cuda',enabled=self.enable_scaler)
 
         for batch_idx, (item_id, item_id_list, cum_item_length, item_idx, flip_index,time_diff) in enumerate(iter_data):
@@ -92,7 +86,6 @@ class IGTMRecTrainer(Trainer):
             training_time_per_epoch += time() - training_time_per_batch
         print(f'training_time_per_epoch: {training_time_per_epoch}')
 
-
         return total_loss
     # 禁用梯度计算
     @torch.no_grad()
@@ -111,7 +104,6 @@ class IGTMRecTrainer(Trainer):
             self.logger.info(message_output)
 
         self.model.eval()
-        # 评估模式？全排序vs负采样
         if isinstance(eval_data, FullSortEvalDataLoader):
             eval_func = self._full_sort_batch_eval
             if self.item_tensor is None:
@@ -144,24 +136,19 @@ class IGTMRecTrainer(Trainer):
             positive_i = positive_i.to(self.device)
             time_diff = time_diff.to(self.device)
 
-
             num_sample += len(cum_item_length)
             inference_time_per_batch = time()
-            # 调用模型的评估函数，返回[Batch,total_item_num]
             scores,valid_loss = eval_func(item_id_list, cum_item_length, item_idx, flip_index,positive_i,time_diff)
             inference_time += time() - inference_time_per_batch
             
-            # 显示设备状态。
             if self.gpu_available and show_progress:
                 iter_data.set_postfix_str(
                     set_color("GPU RAM: " + get_gpu_usage(self.device), "yellow")
                 )
-                # 完成评估数据收集
             self.eval_collector.eval_batch_collect(scores, None, positive_u, positive_i)
 
         self.eval_collector.model_collect(self.model)
         struct = self.eval_collector.get_data_struct()
-        # 计算评估指标，hit@k,ndcg,mrr
         result = self.evaluator.evaluate(struct)
         self.tensorboard.add_scalar("Hit@10", result.get('hit@10'),self.count)
         self.tensorboard.add_scalar("Hit@20", result.get('hit@20'),self.count)
@@ -180,86 +167,12 @@ class IGTMRecTrainer(Trainer):
         return result
     
 
-    # 扰动函数
-    import numpy as np # 确保在文件顶部导入 numpy
-
-    import numpy as np # 确保在文件顶部导入 numpy
-
-    @torch.no_grad() # 我们不需要为这个操作计算梯度
-    def _perturb_sequences(self, item_id_list, time_diff, cum_item_length, perturb_rate):
-
-        
-        # 0% 扰动率 = 什么都不做，直接返回
-        if perturb_rate == 0:
-            print('扰动率为0')
-            return item_id_list, time_diff
-
-        is_shape_mismatch = False
-        if item_id_list.dim() == 1 and time_diff.dim() == 2 and \
-           time_diff.shape[0] == 1 and item_id_list.shape[0] == time_diff.shape[1]:
-            
-            is_shape_mismatch = True 
-        
-            if not hasattr(self, '_warned_shape_mismatch_v3'):
-                self.logger.info("error")
-                self._warned_shape_mismatch_v3 = True
-        
-        # 克隆数据
-        new_item_id_list_np = item_id_list.cpu().clone().numpy() # 1D array [N_total]
-        new_time_diff_np = time_diff.cpu().clone().numpy() # 2D array [1, N_total]
-
-        cum_length_np = cum_item_length.cpu().numpy()
-        start_idx = 0
-        
-        for end_idx in cum_length_np:
-            seq_len = end_idx - start_idx
-            
-            if seq_len < 2:
-                start_idx = end_idx
-                continue
-            
-            num_pairs = seq_len - 1
-            n_swaps = int(np.ceil(num_pairs * perturb_rate)) 
-            
-            if n_swaps == 0:
-                start_idx = end_idx
-                continue
-                
-            j_indices = np.random.choice(num_pairs, n_swaps, replace=False)
-            
-            for j in j_indices:
-                global_j = start_idx + j
-                global_j_plus_1 = global_j + 1
-                
-
-                new_item_id_list_np[global_j], new_item_id_list_np[global_j_plus_1] = \
-                    new_item_id_list_np[global_j_plus_1], new_item_id_list_np[global_j]
-                
-                if is_shape_mismatch:
-
-                    new_time_diff_np[0, global_j], new_time_diff_np[0, global_j_plus_1] = \
-                        new_time_diff_np[0, global_j_plus_1], new_time_diff_np[0, global_j]
-                else:
-   
-                    new_time_diff_np[global_j], new_time_diff_np[global_j_plus_1] = \
-                        new_time_diff_np[global_j_plus_1], new_time_diff_np[global_j]
-
-            start_idx = end_idx
-            
-        # 5. 将两份扰动过的 numpy 数组传回 GPU
-        perturbed_item_id_list = torch.tensor(new_item_id_list_np, dtype=item_id_list.dtype, device=item_id_list.device)
-        perturbed_time_diff = torch.tensor(new_time_diff_np, dtype=time_diff.dtype, device=time_diff.device)
-        
-        return perturbed_item_id_list, perturbed_time_diff
-
-
     def _full_sort_batch_eval(self, item_id_list, cum_item_length, item_idx, flip_index,positive_i,time_diff):
-        # Note: interaction without item ids
-        # 返回的是一个全排序的分数矩阵，形状为 [B, item_num]，其中 B 是批次大小，item_num 是物品总数。对应每一个用户对所有物品的预测分数。
+ 
         scores,valid_loss = self.model.full_sort_predict(item_id_list, cum_item_length, item_idx, flip_index,positive_i,time_diff) # [B, item_num]
-        # 在此对scores的维度进行处理，使其符合预期形状。
+ 
         scores = scores.view(-1, self.tot_item_num)  # [B, item_num]
-        # 将第一个物品分数设置为无穷小，我觉得没什么必要
+ 
         scores[:, 0] = -np.inf # [B, item_num]
         return scores,valid_loss
     
@@ -284,11 +197,8 @@ class IGTMRecTrainer(Trainer):
 
         ranks = np.array(ranks)
 
-        # 计算命中率
         hit_count = np.sum(ranks <= K)
         hit_rate = hit_count / B
         print(f"Step {global_step}: Hit@{K} = {hit_rate * 100:.2f}%")
-        # 写直方图
         writer.add_histogram(tag, ranks, global_step)
-        # 也可以写标量命中率
         writer.add_scalar(f'{tag}_Hit@{K}', hit_rate, global_step)

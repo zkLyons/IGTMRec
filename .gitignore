@@ -7,6 +7,3 @@ preprocess/clip-vit-base-patch32/
 preprocess/coreml
 log_tensorboard/
 runs/
-__pycache__/
-*.pyc
-.DS_Store

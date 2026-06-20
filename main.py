@@ -66,3 +66,4 @@ if __name__ == '__main__':
 
     logger.info(set_color("best valid ", "yellow") + f": {best_valid_result}")
     logger.info(set_color("test result", "yellow") + f": {test_result}")
+    # 整体执行的逻辑为：训练1轮（优化参数）-》测试（锁定参数）-》输出测评结果-》训练2轮（优化参数）...->最后使用测试集进行一轮测试，的到最后的结果，输出。
