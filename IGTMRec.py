@@ -20,7 +20,7 @@ except ImportError:
     RMSNorm, layer_norm_fn, rms_norm_fn = None, None, None
 
 def _init_weights(module, n_layer, initializer_range=0.02,  rescale_prenorm_residual=True, n_residuals_per_layer=1):
-    """ V2 的权重初始化 """
+ 
     if isinstance(module, nn.Linear):
         if module.bias is not None:
             if not getattr(module.bias, "_no_reinit", False):
@@ -36,29 +36,24 @@ def _init_weights(module, n_layer, initializer_range=0.02,  rescale_prenorm_resi
 
 
 class FeedForward(nn.Module):
-    """ 
-    标准的 FFN 模块
-    它包含自己的残差连接和归一化 (Post-Norm)
-    """
+ 
     def __init__(self, d_model, inner_size, dropout=0.2):
         super().__init__()
         self.w_1 = nn.Linear(d_model, inner_size)
         self.w_2 = nn.Linear(inner_size, d_model)
-        self.activation = nn.ReLU() # 您也可以换成 nn.GELU()
+        self.activation = nn.ReLU()  
         self.LayerNorm = nn.LayerNorm(d_model, eps=1e-12)
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, input_tensor):
-        # 预归一化 (Pre-Norm)
+ 
         norm_input = self.LayerNorm(input_tensor)
-        
-        # FFN 计算
+ 
         hidden_states = self.w_1(norm_input)
         hidden_states = self.activation(hidden_states)
         hidden_states = self.dropout(hidden_states)
         hidden_states = self.w_2(hidden_states)
-        
-        # 残差连接
+ 
         hidden_states = self.dropout(hidden_states) + input_tensor
         return hidden_states
 
@@ -106,13 +101,10 @@ class Block(nn.Module):
         super().__init__()
         self.residual_in_fp32 = residual_in_fp32
         self.fused_add_norm = fused_add_norm
-        
-        # 1. Mamba 模块 (序列混合)
+ 
         self.mixer = mixer_cls(dim) 
-        self.norm_mixer = norm_cls(dim) # Mamba 之前的 Pre-Norm
-        
-        # 2. MoE / FFN 模块 (通道混合)
-        self.channel_mixer = channel_mixer_cls # 它内部自带归一化和残差
+        self.norm_mixer = norm_cls(dim)  
+        self.channel_mixer = channel_mixer_cls  
         
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
         if self.fused_add_norm:
@@ -128,7 +120,7 @@ class Block(nn.Module):
             if self.residual_in_fp32:
                 residual_mixer = residual_mixer.to(torch.float32)
         else:
-            # 高性能融合 Add + Norm
+  
             fused_add_norm_fn = rms_norm_fn if isinstance(self.norm_mixer, RMSNorm) else layer_norm_fn
             hidden_states_normed, residual_mixer = fused_add_norm_fn(
                 self.drop_path(hidden_states),
@@ -141,15 +133,11 @@ class Block(nn.Module):
             )
             
         hidden_states_mamba = self.mixer(hidden_states_normed, inference_params=inference_params)
-        
-        # FNN
-        # Mamba 的输出 + 其输入残差，作为通道混合层的输入
+ 
         moe_input = (self.drop_path(hidden_states_mamba) + residual_mixer)
-        
-        # MoE/FFN 模块 (SimpleMoELayer 或 FeedForward)
+ 
         hidden_states_moe = self.channel_mixer(moe_input)
-        
-        # 最终的输出是 MoE 的输出，残差是 MoE 的输入
+ 
         return hidden_states_moe, moe_input
 
     def allocate_inference_cache(self, batch_size, max_seqlen, dtype=None, **kwargs):
@@ -163,11 +151,11 @@ def create_block(d_model, ssm_cfg=None, norm_epsilon=1e-5, rms_norm=False,
     if ssm_cfg is None: ssm_cfg = {}
     factory_kwargs = {"device": device, "dtype": dtype}
     
-    #Mamba 序列混合器
+ 
     mixer_cls = partial(Mamba2, layer_idx=layer_idx, **ssm_cfg, **factory_kwargs)
     norm_cls = partial(nn.LayerNorm if not rms_norm else RMSNorm, eps=norm_epsilon, **factory_kwargs)
     
-    #通道混合器 
+ 
     if use_moe:
         print(f"--- Layer {layer_idx}: 使用 MoE (Experts: {num_experts}) ---")
         channel_mixer_cls = SimpleMoELayer(
@@ -180,14 +168,14 @@ def create_block(d_model, ssm_cfg=None, norm_epsilon=1e-5, rms_norm=False,
         print(f"--- Layer {layer_idx}: 使用标准 FFN ---")
         channel_mixer_cls = FeedForward(
             d_model, 
-            d_model * moe_inner_factor, # FFN 内部维度也由 factor 控制
+            d_model * moe_inner_factor,  
             dropout=moe_dropout
         )
         
     block = Block(
         d_model,
         mixer_cls,
-        channel_mixer_cls, # 传入 MoE 或 FFN 模块
+        channel_mixer_cls,  
         norm_cls=norm_cls,
         fused_add_norm=fused_add_norm,
         residual_in_fp32=residual_in_fp32,
@@ -227,7 +215,7 @@ class MixerModel(nn.Module):
         self.fused_add_norm = fused_add_norm
         if self.fused_add_norm:
             if layer_norm_fn is None or rms_norm_fn is None:
-                # 避免抛出错误，但如果 fused_add_norm=True 仍会失败
+ 
                 print("--- 严重警告: fused_add_norm=True 但 Triton 内核导入失败! ---")
                 print("--- 请在实例化 MixerModel 时设置 fused_add_norm=False ---")
 
@@ -290,22 +278,17 @@ class MixerModel(nn.Module):
     ):
 
         B, L, D = x.shape
-        
-        # 计算重要性 O(L)
+ 
         importance = self.importance_predictor(x).squeeze(-1) # [B, L]
-        
-        # 逻辑：生成掩码
-        # True = 不重要, 打乱; False = 重要, 保留
+ 
         shuffle_mask = (torch.rand(B, L, device=x.device) > importance).unsqueeze(-1) # [B, L, 1]
-
-        # 逻辑：准备完全打乱的索引
+ 
         shuffled_indices = torch.randperm(L, device=x.device).unsqueeze(0).repeat(B, 1) # [B, L]
         inverse_indices = torch.argsort(shuffled_indices, dim=1) # [B, L]
         
         shuffled_indices_lookup = shuffled_indices.unsqueeze(-1).expand(-1, -1, D)
         inverse_indices_lookup = inverse_indices.unsqueeze(-1).expand(-1, -1, D)
-
-        #融合输入
+ 
         x_shuffled = x.gather(1, shuffled_indices_lookup)
         x_permuted = torch.where(shuffle_mask, x_shuffled, x)
 
@@ -314,16 +297,13 @@ class MixerModel(nn.Module):
             res_permuted = torch.where(shuffle_mask, res_shuffled, residual)
         else:
             res_permuted = None
-
-        # Mamba+fnn Block 处理
+ 
         output_permuted, res_out_permuted = layer(
             x_permuted, res_permuted, inference_params=inference_params
         )
-
-        # 准备完全恢复的序列
+ 
         output_unshuffled = output_permuted.gather(1, inverse_indices_lookup)
-        
-        #  融合输出 (恢复)
+ 
         output = torch.where(shuffle_mask, output_unshuffled, output_permuted)
 
         if res_out_permuted is not None:
@@ -341,8 +321,7 @@ class MixerModel(nn.Module):
             hidden_states = hidden_states + pos
             
         for i, layer in enumerate(self.layers):
-            
-            # --- HYBRID Shuffle 策略 ---
+ 
             prob = self.shuffle_probs[min(i, len(self.shuffle_probs)-1)]
             
             if self.training and torch.rand(1).item() < prob:
@@ -350,7 +329,7 @@ class MixerModel(nn.Module):
                     hidden_states, residual, layer, inference_params=inference_params
                 )
             else:
-                # 执行标准 Block (Mamba + FFN)
+ 
                 hidden_states, residual = layer(
                     hidden_states, residual, inference_params=inference_params
                 )
