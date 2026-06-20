@@ -1,6 +1,6 @@
 
 saved/
-*.pt
+
 *.pth
 preprocess/bert-base-uncased/
 preprocess/clip-vit-base-patch32/
