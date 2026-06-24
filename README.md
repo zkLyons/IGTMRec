@@ -2,7 +2,7 @@
   <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-DFE0E5"></a>
   <a href="./README_zh.md"><img alt="简体中文版自述文件" src="https://img.shields.io/badge/简体中文-DBEDFA"></a>
 </p>
-  ![](https://komarev.com/ghpvc/?username=zkLyons&label=Views&color=yellow&style= for-the-badge )
+  ![](https://komarev.com/ghpvc/?username=zkLyons&label=Views&color=yellow)
 
 # Breaking sequential bias: Importance-guided temporal multimodal recommendation via state space models
 
