@@ -1,6 +1,7 @@
 <p align="center">
   <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-DFE0E5"></a>
   <a href="./README_zh.md"><img alt="简体中文版自述文件" src="https://img.shields.io/badge/简体中文-DBEDFA"></a>
+  ![](https://komarev.com/ghpvc/?username=chenmeilong)
 </p>
 
 # Breaking sequential bias: Importance-guided temporal multimodal recommendation via state space models
@@ -46,6 +47,7 @@ This work is published on **ESWA (Expert Systems with Applications)**: [Breaking
 **TMSR (Time-aware Multi-Scale Routing)**
 
 TMSR decouples feature processing into two levels:
+
 - **Bottom layer**: Constructs a unified multi-modal representation through early fusion and extracts modal features at different temporal scales via multi-branch GTUs (Gated Temporal Units)
 - **Top layer**: Utilizes physical time intervals as explicit prior signals to dynamically schedule gated temporal receptive fields of varying spans, enabling the model to adaptively select historical information based on real-time intervals
 
@@ -129,18 +131,18 @@ python main.py
 
 All hyperparameters are configured in `config.yaml`, including:
 
-| Parameter               | Description                    | Default Value |
-| ----------------------- | ------------------------------ | ------------- |
-| `hidden_size`           | Feature dimension              | 256           |
-| `d_state`               | SSM state expansion dimension  | 64            |
-| `d_conv`                | Local convolution width        | 4             |
-| `expand`                | Block expansion factor         | 2             |
-| `headdim`               | Attention head dimension       | 16            |
-| `num_layers`            | Number of IGTMRec layers       | 3             |
-| `dropout_prob`          | Dropout probability            | 0.4           |
-| `learning_rate`         | Learning rate                  | 0.0001        |
-| `train_batch_size`      | Training batch size            | 1024          |
-| `MAX_ITEM_LIST_LENGTH`  | Maximum sequence length        | 200           |
+| Parameter              | Description                   | Default Value |
+| ---------------------- | ----------------------------- | ------------- |
+| `hidden_size`          | Feature dimension             | 256           |
+| `d_state`              | SSM state expansion dimension | 64            |
+| `d_conv`               | Local convolution width       | 4             |
+| `expand`               | Block expansion factor        | 2             |
+| `headdim`              | Attention head dimension      | 16            |
+| `num_layers`           | Number of IGTMRec layers      | 3             |
+| `dropout_prob`         | Dropout probability           | 0.4           |
+| `learning_rate`        | Learning rate                 | 0.0001        |
+| `train_batch_size`     | Training batch size           | 1024          |
+| `MAX_ITEM_LIST_LENGTH` | Maximum sequence length       | 200           |
 
 To switch datasets, modify the corresponding dataset configuration block in `config.yaml`, uncommenting the desired dataset and commenting out others.
 
